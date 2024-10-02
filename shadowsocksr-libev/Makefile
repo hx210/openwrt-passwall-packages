@@ -55,8 +55,7 @@ $(eval $(call shadowsocksr-libev/templates))
 CONFIGURE_ARGS += \
 	--disable-documentation \
 	--disable-ssp \
-	--disable-assert \
-	--enable-static
+	--disable-assert
 
 TARGET_CFLAGS += -flto
 TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed
