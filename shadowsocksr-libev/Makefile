@@ -56,7 +56,7 @@ CONFIGURE_ARGS += \
 	--disable-documentation \
 	--disable-ssp \
 	--disable-assert \
-	--enable-system-shared-lib
+	--enable-static
 
 TARGET_CFLAGS += -flto
 TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed
