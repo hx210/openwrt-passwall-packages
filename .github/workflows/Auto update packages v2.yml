@@ -30,7 +30,7 @@ env:
 
 jobs:
   job_init:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -56,23 +56,23 @@ jobs:
   job_auto_update_packages:
     if: ${{ always() }}
     needs: job_init
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Auto-update-${{ matrix.pakcages }} 
     strategy:
       fail-fast: false
       matrix:
-        pakcages: [brook, hysteria, ipt2socks, microsocks, shadowsocks-rust, sing-box, trojan, trojan-go, v2ray-core, v2ray-plugin, xray-core, xray-plugin, v2ray-geoip, v2ray-geosite, dns2tcp]
+        pakcages: [hysteria, ipt2socks, microsocks, shadowsocks-rust, sing-box, trojan, v2ray-core, v2ray-plugin, xray-core, xray-plugin, v2ray-geoip, v2ray-geosite, dns2tcp]
         include:
-          - pakcages: brook
-            folder: brook
-            version_head: PKG_VERSION:=
-            hash_head: PKG_HASH:=
-            version_line:
-            hash_line:
-            release_api_command: curl -sL "https://api.github.com/repos/txthinking/brook/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
-            prerelease_api_command: curl -sL "https://api.github.com/repos/txthinking/brook/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
-            release_download_url: https://codeload.github.com/txthinking/brook/tar.gz/v
-            file_name:
+          # - pakcages: brook
+          #   folder: brook
+          #   version_head: PKG_VERSION:=
+          #   hash_head: PKG_HASH:=
+          #   version_line:
+          #   hash_line:
+          #   release_api_command: curl -sL "https://api.github.com/repos/txthinking/brook/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+          #   prerelease_api_command: curl -sL "https://api.github.com/repos/txthinking/brook/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
+          #   release_download_url: https://codeload.github.com/txthinking/brook/tar.gz/v
+          #   file_name:
 
           # - pakcages: chinadns-ng
           #   folder: chinadns-ng
@@ -150,16 +150,16 @@ jobs:
             release_download_url: https://codeload.github.com/trojan-gfw/trojan/tar.gz/v
             file_name:
 
-          - pakcages: trojan-go
-            folder: trojan-go
-            version_head: PKG_VERSION:=
-            hash_head: PKG_HASH:=
-            version_line:
-            hash_line:
-            release_api_command: curl -sL "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
-            prerelease_api_command: curl -sL "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
-            release_download_url: https://codeload.github.com/p4gefau1t/trojan-go/tar.gz/v
-            file_name:
+          # - pakcages: trojan-go
+          #   folder: trojan-go
+          #   version_head: PKG_VERSION:=
+          #   hash_head: PKG_HASH:=
+          #   version_line:
+          #   hash_line:
+          #   release_api_command: curl -sL "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+          #   prerelease_api_command: curl -sL "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
+          #   release_download_url: https://codeload.github.com/p4gefau1t/trojan-go/tar.gz/v
+          #   file_name:
 
           - pakcages: v2ray-core
             folder: v2ray-core
@@ -277,18 +277,19 @@ jobs:
 
             result=0
 
-            ver1=$(echo "$Old_PKG_VERSION" | sed 's/[^0-9]//g')
-            ver2=$(echo "$New_PKG_VERSION" | sed 's/[^0-9]//g')
+            ver1="$Old_PKG_VERSION"
+            ver2="$New_PKG_VERSION"
 
-            if [[ "$ver1" == "$ver2" ]]; then
-              result=0
-            elif [[ "$ver1" -lt "$ver2" ]]; then
+            # 使用 sort -V 进行版本号比较
+            if [[ "$(printf "%s\n%s" "$ver1" "$ver2" | sort -V | head -n 1)" == "$ver1" && "$ver1" != "$ver2" ]]; then
               result=1
+            elif [[ "$ver1" == "$ver2" ]]; then
+              result=0
             else
               result=2
             fi
 
-            echo "版本对比结果：$result "
+            echo "版本对比结果：$result"
 
             if [[ $result -eq 0 ]]; then
               echo "status=failure" >> $GITHUB_OUTPUT
